@@ -9,6 +9,12 @@ enum LoginResponse {
   SERVER_ERROR
 }
 
+enum ConfirmCodeResponse {
+  SUCCESS,
+  INVALID_CODE,
+  SERVER_ERROR
+}
+
 class AuthController {
   final AuthService service = AuthService();
 
@@ -24,7 +30,7 @@ class AuthController {
         return LoginResponse.INVALID_CREDENTIALS;
       }
 
-      if (response.containsKey('redirect')) {
+      if (response['body'].containsKey('redirect')) {
         return LoginResponse.NEEDS_CONFIRMATION;
       }
 
@@ -34,6 +40,27 @@ class AuthController {
     } catch (e) {
       // Exception occurred during request
       return LoginResponse.SERVER_ERROR;
+    }
+  }
+
+  Future<ConfirmCodeResponse> confirmUser(String email, String code) async {
+    try {
+      final response = await service.confirmUser(email, code);
+
+      if (response.containsKey('error')) {
+        return ConfirmCodeResponse.SERVER_ERROR;
+      }
+
+      if (response['status'] == 401) {
+        return ConfirmCodeResponse.INVALID_CODE;
+      }
+
+      TokenManager.storeToken(response['body']['token']);
+
+      return ConfirmCodeResponse.SUCCESS;
+    } catch (e) {
+      // Exception occurred during request
+      return ConfirmCodeResponse.SERVER_ERROR;
     }
   }
 }
