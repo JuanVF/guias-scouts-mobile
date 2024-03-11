@@ -3,21 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/controller/auth_controller.dart';
 import 'package:guias_scouts_mobile/pages/LoginPage/login_page.dart';
 
-
-class Login extends StatefulWidget {
+class Confirm extends StatefulWidget {
   final void Function(LoginComponents) switchComponent; // Callback function
-  final void Function(String) setUserEmail; // Callback function
-  const Login({Key? key, required this.switchComponent, required this.setUserEmail}) : super(key: key);
+  final String Function() getUserEmail; // Callback function
+  const Confirm(
+      {Key? key, required this.switchComponent, required this.getUserEmail})
+      : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  _ConfirmState createState() => _ConfirmState();
 }
 
-class _LoginState extends State<Login> {
-  bool _obscureText = true;
-
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+class _ConfirmState extends State<Confirm> {
+  TextEditingController codeController = TextEditingController();
 
   AuthController controller = AuthController();
 
@@ -43,25 +41,19 @@ class _LoginState extends State<Login> {
   }
 
   // Function to handle the login process
-  Future<void> handleLogin() async {
-    String email = emailController.text;
-    String password = passwordController.text;
+  Future<void> handleConfirm() async {
+    String email = widget.getUserEmail();
+    String code = codeController.text;
 
-    LoginResponse result = await controller.login(email, password);
+    ConfirmCodeResponse result = await controller.confirmUser(email, code);
 
-    if (result == LoginResponse.SERVER_ERROR) {
+    if (result == ConfirmCodeResponse.SERVER_ERROR) {
       showErrorDialog('Ha ocurrido un error. Inténtelo de nuevo.');
       return;
     }
 
-    if (result == LoginResponse.INVALID_CREDENTIALS) {
-      showErrorDialog('Credenciales Inválidas.');
-      return;
-    }
-
-    if (result == LoginResponse.NEEDS_CONFIRMATION) {
-      widget.setUserEmail(email);
-      widget.switchComponent(LoginComponents.CONFIRM_USER);
+    if (result == ConfirmCodeResponse.INVALID_CODE) {
+      showErrorDialog('Código Inválido.');
       return;
     }
   }
@@ -74,7 +66,7 @@ class _LoginState extends State<Login> {
       children: <Widget>[
         const SizedBox(height: 40),
         const Text(
-          'Iniciar Sesión',
+          'Confirmar Usuario',
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -82,32 +74,23 @@ class _LoginState extends State<Login> {
             color: Color.fromRGBO(48, 16, 101, 1),
           ),
         ),
-        averageSpacing,
-        TextField(
-          keyboardType: TextInputType.emailAddress,
-          controller: emailController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Correo',
-            hintText: 'jhon@doe.com',
+        const SizedBox(height: 10),
+        const Text(
+          '''¡Bienvenido a Guías Online!\nPara confirmar tu usuario te hemos envíado un código de confirmación a tu correo.''',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.normal,
+            fontFamily: 'Inter',
+            color: Color.fromRGBO(0, 0, 0, 1),
           ),
         ),
         averageSpacing,
         TextField(
-          obscureText: _obscureText,
-          controller: passwordController,
-          keyboardType: TextInputType.visiblePassword,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: 'Contraseña',
-            suffixIcon: IconButton(
-              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            ),
+          controller: codeController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Código',
+            hintText: 'ABCD-1234',
           ),
         ),
         averageSpacing,
@@ -119,8 +102,8 @@ class _LoginState extends State<Login> {
             backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
             foregroundColor: Colors.white,
           ),
-          onPressed: handleLogin,
-          child: const Text('Iniciar Sesión'),
+          onPressed: handleConfirm,
+          child: const Text('Confirmar Usuario'),
         ),
         averageSpacing,
         TextButton(
@@ -131,8 +114,10 @@ class _LoginState extends State<Login> {
             foregroundColor: const Color.fromRGBO(48, 16, 101, 1),
             backgroundColor: Colors.white,
           ),
-          onPressed: () {},
-          child: const Text('Olvidé la Contraseña'),
+          onPressed: () {
+            widget.switchComponent(LoginComponents.LOGIN);
+          },
+          child: const Text('Volver a Inicio de Sesión'),
         ),
         averageSpacing,
         Image.asset(
