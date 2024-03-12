@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/controller/auth_controller.dart';
 import 'package:guias_scouts_mobile/pages/LoginPage/login_page.dart';
-
+import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
 
 class Login extends StatefulWidget {
   final void Function(LoginComponents) switchComponent; // Callback function
   final void Function(String) setUserEmail; // Callback function
-  const Login({Key? key, required this.switchComponent, required this.setUserEmail}) : super(key: key);
+  const Login(
+      {Key? key, required this.switchComponent, required this.setUserEmail})
+      : super(key: key);
 
   @override
   _LoginState createState() => _LoginState();
@@ -64,6 +66,9 @@ class _LoginState extends State<Login> {
       widget.switchComponent(LoginComponents.CONFIRM_USER);
       return;
     }
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const MainPage()));
   }
 
   @override
@@ -101,7 +106,8 @@ class _LoginState extends State<Login> {
             border: const OutlineInputBorder(),
             labelText: 'Contraseña',
             suffixIcon: IconButton(
-              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+              icon:
+                  Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
                 setState(() {
                   _obscureText = !_obscureText;
