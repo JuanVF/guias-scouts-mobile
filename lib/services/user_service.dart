@@ -20,47 +20,26 @@
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'dart:convert';
+import 'package:guias_scouts_mobile/common/token_manager.dart';
 import 'package:http/http.dart' as http;
 
-class AuthService {
-  final String baseUrl = 'http://localhost:5000/auth';
+class UserService {
+  final String baseUrl = 'http://localhost:5000/user';
 
-  /// GU-01: Login Use Case
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/login');
-    final body = {'email': email, 'password': password};
+  /// GU-07: Change Password Use Case
+  Future<Map<String, dynamic>> login(String prevPassword, String newPassword) async {
+    final url = Uri.parse('$baseUrl/change-password');
+    final body = {'prevPassword': prevPassword, 'newPassword': newPassword};
 
     try {
+      final token = await TokenManager.getToken();
       final response = await http.post(
         url,
         body: json.encode(body),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-
-        return responseData;
-      } else {
-        // Request failed
-        return {'error': 'Failed to login. Status code: ${response.statusCode}'};
-      }
-    } catch (e) {
-      // Exception occurred during request
-      return {'error': 'Exception occurred: $e'};
-    }
-  }
-
-  /// GU-04: Confirm User Use Case
-  Future<Map<String, dynamic>> confirmUser(String email, String code) async {
-    final url = Uri.parse('$baseUrl/confirm_user');
-    final body = {'email': email, 'code': code};
-
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(body),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
       );
 
       if (response.statusCode == 200) {

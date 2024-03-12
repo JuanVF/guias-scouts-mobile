@@ -19,68 +19,33 @@
 // of this software, even if advised of the possibility of such damage.
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
-import 'package:guias_scouts_mobile/common/token_manager.dart';
-import 'package:guias_scouts_mobile/services/auth_service.dart';
+import 'package:guias_scouts_mobile/services/user_service.dart';
 
-enum LoginResponse {
-  NEEDS_CONFIRMATION,
+enum ChangePasswordResponse {
   SUCCESS,
-  INVALID_CREDENTIALS,
+  INVALID_PASSWORD,
   SERVER_ERROR
 }
 
-enum ConfirmCodeResponse {
-  SUCCESS,
-  INVALID_CODE,
-  SERVER_ERROR
-}
+class UserController {
+  final UserService service = UserService();
 
-class AuthController {
-  final AuthService service = AuthService();
-
-  Future<LoginResponse> login(String email, String password) async {
+  Future<ChangePasswordResponse> changePassword(String email, String password) async {
     try {
       final response = await service.login(email, password);
 
       if (response.containsKey('error')) {
-        return LoginResponse.SERVER_ERROR;
+        return ChangePasswordResponse.SERVER_ERROR;
       }
 
-      if (response['status'] == 401) {
-        return LoginResponse.INVALID_CREDENTIALS;
+      if (response['status'] != 200) {
+        return ChangePasswordResponse.INVALID_PASSWORD;
       }
 
-      if (response['body'].containsKey('redirect')) {
-        return LoginResponse.NEEDS_CONFIRMATION;
-      }
-
-      TokenManager.storeToken(response['body']['token']);
-
-      return LoginResponse.SUCCESS;
+      return ChangePasswordResponse.SUCCESS;
     } catch (e) {
       // Exception occurred during request
-      return LoginResponse.SERVER_ERROR;
-    }
-  }
-
-  Future<ConfirmCodeResponse> confirmUser(String email, String code) async {
-    try {
-      final response = await service.confirmUser(email, code);
-
-      if (response.containsKey('error')) {
-        return ConfirmCodeResponse.SERVER_ERROR;
-      }
-
-      if (response['status'] == 401) {
-        return ConfirmCodeResponse.INVALID_CODE;
-      }
-
-      TokenManager.storeToken(response['body']['token']);
-
-      return ConfirmCodeResponse.SUCCESS;
-    } catch (e) {
-      // Exception occurred during request
-      return ConfirmCodeResponse.SERVER_ERROR;
+      return ChangePasswordResponse.SERVER_ERROR;
     }
   }
 }

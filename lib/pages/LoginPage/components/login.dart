@@ -1,13 +1,36 @@
+// Copyright (c) 2024 Guias Scouts
+//
+// All rights reserved. This file and the source code it contains is
+// confidential and proprietary to Guias Scouts. No part of this
+// file may be reproduced, stored in a retrieval system, or transmitted
+// in any form or by any means, electronic, mechanical, photocopying,
+// recording, or otherwise, without the prior written permission of
+// Guias Scouts.
+//
+// This file is provided "as is" with no warranties of any kind, express
+// or implied, including but not limited to, any implied warranty of
+// merchantability, fitness for a particular purpose, or non-infringement.
+// In no event shall Guias Scouts be liable for any direct, indirect,
+// incidental, special, exemplary, or consequential damages (including, but
+// not limited to, procurement of substitute goods or services; loss of use,
+// data, or profits; or business interruption) however caused and on any
+// theory of liability, whether in contract, strict liability, or tort
+// (including negligence or otherwise) arising in any way out of the use
+// of this software, even if advised of the possibility of such damage.
+//
+// For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/controller/auth_controller.dart';
 import 'package:guias_scouts_mobile/pages/LoginPage/login_page.dart';
-
+import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
 
 class Login extends StatefulWidget {
   final void Function(LoginComponents) switchComponent; // Callback function
   final void Function(String) setUserEmail; // Callback function
-  const Login({Key? key, required this.switchComponent, required this.setUserEmail}) : super(key: key);
+  const Login(
+      {Key? key, required this.switchComponent, required this.setUserEmail})
+      : super(key: key);
 
   @override
   _LoginState createState() => _LoginState();
@@ -64,6 +87,9 @@ class _LoginState extends State<Login> {
       widget.switchComponent(LoginComponents.CONFIRM_USER);
       return;
     }
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const MainPage()));
   }
 
   @override
@@ -101,7 +127,8 @@ class _LoginState extends State<Login> {
             border: const OutlineInputBorder(),
             labelText: 'Contraseña',
             suffixIcon: IconButton(
-              icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+              icon:
+                  Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
               onPressed: () {
                 setState(() {
                   _obscureText = !_obscureText;
