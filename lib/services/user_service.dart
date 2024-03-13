@@ -55,4 +55,61 @@ class UserService {
       return {'error': 'Exception occurred: $e'};
     }
   }
+
+  /// Create User
+  Future<Map<String, dynamic>> createUser(Map<String, dynamic> user) async {
+    final url = Uri.parse('$baseUrl/register-user');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.post(
+        url,
+        body: json.encode(user),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {'error': 'Failed to login. Status code: ${response.statusCode}'};
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
+
+  /// Get Profile
+  Future<Map<String, dynamic>> getProfile() async {
+    final url = Uri.parse('$baseUrl/profile');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {'error': 'Failed to login. Status code: ${response.statusCode}'};
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
 }

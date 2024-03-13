@@ -27,6 +27,11 @@ enum ChangePasswordResponse {
   SERVER_ERROR
 }
 
+enum CreateUserResponse {
+  SUCCESS,
+  SERVER_ERROR
+}
+
 class UserController {
   final UserService service = UserService();
 
@@ -46,6 +51,44 @@ class UserController {
     } catch (e) {
       // Exception occurred during request
       return ChangePasswordResponse.SERVER_ERROR;
+    }
+  }
+
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final response = await service.getProfile();
+
+      if (response.containsKey('error')) {
+        return {};
+      }
+
+      if (response['status'] != 200) {
+        return {};
+      }
+
+      return response['body']['user'];
+    } catch (e) {
+      // Exception occurred during request
+      return {};
+    }
+  }
+
+  Future<CreateUserResponse> createUser(Map<String, dynamic> user) async {
+    try {
+      final response = await service.createUser(user);
+
+      if (response.containsKey('error')) {
+        return CreateUserResponse.SERVER_ERROR;
+      }
+
+      if (response['status'] != 200) {
+        return CreateUserResponse.SERVER_ERROR;
+      }
+
+      return CreateUserResponse.SUCCESS;
+    } catch (e) {
+      // Exception occurred during request
+      return CreateUserResponse.SERVER_ERROR;
     }
   }
 }
