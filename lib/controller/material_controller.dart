@@ -19,42 +19,29 @@
 // of this software, even if advised of the possibility of such damage.
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
+import 'package:guias_scouts_mobile/services/material_service.dart';
 
-class TokenManager {
-  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+class MaterialController {
+  final MaterialService service = MaterialService();
 
-  static Future<void> storeToken(String token) async {
-    await _storage.write(key: 'token', value: token);
-  }
+  Future<List<Map<String, dynamic>>> search(String q) async {
+    try {
+      final response = await service.search(q);
 
-  static Future<String?> getToken() async {
-    return await _storage.read(key: 'token');
-  }
+      if (response.containsKey('error')) {
+        return [];
+      }
 
-  static Future<Map<String, dynamic>?> getDecodedToken() async {
-    String? token = await getToken();
-    if (token == null) return null;
+      if (response['status'] != 200) {
+        return [];
+      }
 
-    List<String> parts = token.split('.');
-    if (parts.length != 3) {
-      // Invalid token
-      return null;
+      List<dynamic> rawMaterials = response['body']['materials'];
+      List<Map<String, dynamic>> materials = rawMaterials.map<Map<String, dynamic>>((material) => material as Map<String, dynamic>).toList();
+
+      return materials;
+    } catch (e) {
+      return [];
     }
-
-    String decodedPayload = _decodeBase64(parts[1]);
-    return jsonDecode(decodedPayload);
-  }
-
-  static String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
-    switch (output.length % 4) {
-      case 0: break;
-      case 2: output += '=='; break;
-      case 3: output += '='; break;
-      default: throw Exception('Illegal base64url string!"');
-    }
-    return utf8.decode(base64Url.decode(output));
   }
 }

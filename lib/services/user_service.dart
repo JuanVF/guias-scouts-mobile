@@ -21,10 +21,11 @@
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'dart:convert';
 import 'package:guias_scouts_mobile/common/token_manager.dart';
+import 'package:guias_scouts_mobile/services/service_config.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  final String baseUrl = 'http://localhost:5000/user';
+  final String baseUrl = '${ServiceConfig.host}/user';
 
   /// GU-07: Change Password Use Case
   Future<Map<String, dynamic>> login(String prevPassword, String newPassword) async {

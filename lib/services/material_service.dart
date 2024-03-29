@@ -19,42 +19,43 @@
 // of this software, even if advised of the possibility of such damage.
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+import 'package:guias_scouts_mobile/common/token_manager.dart';
+import 'package:guias_scouts_mobile/services/service_config.dart';
+import 'package:http/http.dart' as http;
 
-class TokenManager {
-  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+class MaterialService {
+  final String baseUrl = '${ServiceConfig.host}/material';
 
-  static Future<void> storeToken(String token) async {
-    await _storage.write(key: 'token', value: token);
-  }
+  /// MAT-01: Search Materials Use Case
+  Future<Map<String, dynamic>> search(String q) async {
+    final Map<String, String> params = {'q': q};
+    final queryString = Uri(queryParameters: params).query;
+    final url = Uri.parse('$baseUrl/search?$queryString');
 
-  static Future<String?> getToken() async {
-    return await _storage.read(key: 'token');
-  }
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
 
-  static Future<Map<String, dynamic>?> getDecodedToken() async {
-    String? token = await getToken();
-    if (token == null) return null;
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
 
-    List<String> parts = token.split('.');
-    if (parts.length != 3) {
-      // Invalid token
-      return null;
+        return responseData;
+      } else {
+        // Request failed
+        return {
+          'error': 'Failed to login. Status code: ${response.statusCode}'
+        };
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
     }
-
-    String decodedPayload = _decodeBase64(parts[1]);
-    return jsonDecode(decodedPayload);
-  }
-
-  static String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
-    switch (output.length % 4) {
-      case 0: break;
-      case 2: output += '=='; break;
-      case 3: output += '='; break;
-      default: throw Exception('Illegal base64url string!"');
-    }
-    return utf8.decode(base64Url.decode(output));
   }
 }
