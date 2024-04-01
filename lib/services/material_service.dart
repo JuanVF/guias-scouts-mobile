@@ -50,7 +50,39 @@ class MaterialService {
       } else {
         // Request failed
         return {
-          'error': 'Failed to login. Status code: ${response.statusCode}'
+          'error': 'Failed to search material. Status code: ${response.statusCode}'
+        };
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
+
+  /// MAT-04: Delete Materials Use Case
+  Future<Map<String, dynamic>> delete(int id) async {
+    final Map<String, String> params = {'id': "$id"};
+    final queryString = Uri(queryParameters: params).query;
+    final url = Uri.parse('$baseUrl/delete?$queryString');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {
+          'error': 'Failed to delete material. Status code: ${response.statusCode}'
         };
       }
     } catch (e) {

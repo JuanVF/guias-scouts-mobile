@@ -44,4 +44,22 @@ class MaterialController {
       return [];
     }
   }
+
+  Future<bool> delete(int id) async {
+    try {
+      final response = await service.delete(id);
+
+      if (response.containsKey('error')) {
+        return false;
+      }
+
+      if (response['status'] != 200) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

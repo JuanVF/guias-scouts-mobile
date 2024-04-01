@@ -29,7 +29,8 @@ import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
 
 class Materials extends StatefulWidget {
   final void Function(MainComponents) switchComponent; // Callback function
-  const Materials({Key? key, required this.switchComponent}) : super(key: key);
+  final void Function(Map<String, dynamic>) setMaterial; // Callback function
+  const Materials({Key? key, required this.switchComponent, required this.setMaterial}) : super(key: key);
 
   @override
   _Materials createState() => _Materials();
@@ -82,7 +83,13 @@ class _Materials extends State<Materials> {
               ),
             ),
           ),
-          const Icon(Icons.remove_red_eye, color: Color.fromRGBO(48, 16, 101, 1)),
+          InkWell(
+            onTap: () {
+              widget.setMaterial(material);
+              widget.switchComponent(MainComponents.MATERIAL_DETAIL);
+            },
+            child: const Icon(Icons.remove_red_eye, color: Color.fromRGBO(48, 16, 101, 1)),
+          )
         ],
       ),
     );
