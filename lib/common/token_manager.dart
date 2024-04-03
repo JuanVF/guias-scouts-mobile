@@ -20,7 +20,6 @@
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
 
 class TokenManager {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -31,30 +30,5 @@ class TokenManager {
 
   static Future<String?> getToken() async {
     return await _storage.read(key: 'token');
-  }
-
-  static Future<Map<String, dynamic>?> getDecodedToken() async {
-    String? token = await getToken();
-    if (token == null) return null;
-
-    List<String> parts = token.split('.');
-    if (parts.length != 3) {
-      // Invalid token
-      return null;
-    }
-
-    String decodedPayload = _decodeBase64(parts[1]);
-    return jsonDecode(decodedPayload);
-  }
-
-  static String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
-    switch (output.length % 4) {
-      case 0: break;
-      case 2: output += '=='; break;
-      case 3: output += '='; break;
-      default: throw Exception('Illegal base64url string!"');
-    }
-    return utf8.decode(base64Url.decode(output));
   }
 }

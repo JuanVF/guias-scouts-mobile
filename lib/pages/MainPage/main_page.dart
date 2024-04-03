@@ -21,12 +21,10 @@
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_user.dart';
-import 'package:guias_scouts_mobile/pages/MainPage/components/material_detail.dart';
-import 'package:guias_scouts_mobile/pages/MainPage/components/materials.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/my_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/users.dart';
 
-enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, CREATE_USER }
+enum MainComponents { MY_USER, MATERIAL, PROGRESS, USERS, CREATE_USER }
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -36,9 +34,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPage extends State<MainPage> {
-  MainComponents _currentComponent = MainComponents.MATERIALS;
-  Map<String, dynamic> _currentMaterial = {};
-  int _selectedIndex = 1;
+  MainComponents _currentComponent = MainComponents.USERS;
+  int _selectedIndex = 0;
 
   // Function to switch to a different component
   void switchComponent(MainComponents component) {
@@ -47,18 +44,11 @@ class _MainPage extends State<MainPage> {
     });
   }
 
-  // Function to switch to a different component
-  void setMaterial(Map<String, dynamic> material) {
-    setState(() {
-      _currentMaterial = material;
-    });
-  }
-
   // Define the function to handle bottom navigation item selection
   void _onItemTapped(int index) {
     List<MainComponents> pages = [
       MainComponents.USERS,
-      MainComponents.MATERIALS,
+      MainComponents.MATERIAL,
       MainComponents.MY_USER
     ];
     setState(() {
@@ -74,11 +64,6 @@ class _MainPage extends State<MainPage> {
         return _buildMainPage(Users(
           switchComponent: switchComponent,
         ));
-      case MainComponents.MATERIALS:
-        return _buildMainPage(Materials(
-          switchComponent: switchComponent,
-          setMaterial: setMaterial,
-        ));
       case MainComponents.MY_USER:
         return _buildMainPage(MyUser(
           switchComponent: switchComponent,
@@ -86,11 +71,6 @@ class _MainPage extends State<MainPage> {
       case MainComponents.CREATE_USER:
         return _buildMainPage(CreateUser(
           switchComponent: switchComponent,
-        ));
-      case MainComponents.MATERIAL_DETAIL:
-        return _buildMainPage(MaterialDetail(
-          switchComponent: switchComponent,
-          material: _currentMaterial,
         ));
       default:
         return _buildMainPage(MyUser(
