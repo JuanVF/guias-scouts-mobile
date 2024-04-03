@@ -178,7 +178,7 @@ class _MyUser extends State<MyUser> {
                             ),
                             textAlign: TextAlign.left, // Align text to the left
                           ),
-                           averageInnerSpacing,
+                          averageInnerSpacing,
                           TextField(
                             controller: TextEditingController()..text = snapshot.data?["fullname"] ?? '',
                             decoration: const InputDecoration(

@@ -24,13 +24,80 @@ import 'package:guias_scouts_mobile/common/token_manager.dart';
 import 'package:guias_scouts_mobile/services/service_config.dart';
 import 'package:http/http.dart' as http;
 
-class UserService {
-  final String baseUrl = '${ServiceConfig.host}/user';
+class MaterialService {
+  final String baseUrl = '${ServiceConfig.host}/material';
 
-  /// GU-07: Change Password Use Case
-  Future<Map<String, dynamic>> login(String prevPassword, String newPassword) async {
-    final url = Uri.parse('$baseUrl/change-password');
-    final body = {'prevPassword': prevPassword, 'newPassword': newPassword};
+  /// MAT-01: Search Materials Use Case
+  Future<Map<String, dynamic>> search(String q) async {
+    final Map<String, String> params = {'q': q};
+    final queryString = Uri(queryParameters: params).query;
+    final url = Uri.parse('$baseUrl/search?$queryString');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {
+          'error':
+              'Failed to search material. Status code: ${response.statusCode}'
+        };
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
+
+  /// MAT-04: Delete Materials Use Case
+  Future<Map<String, dynamic>> delete(int id) async {
+    final Map<String, String> params = {'id': "$id"};
+    final queryString = Uri(queryParameters: params).query;
+    final url = Uri.parse('$baseUrl/delete?$queryString');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {
+          'error':
+              'Failed to delete material. Status code: ${response.statusCode}'
+        };
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
+
+  /// Create Material
+  Future<Map<String, dynamic>> create(
+      String title, String file, String extension) async {
+    final url = Uri.parse('$baseUrl/add-material');
+    final body = {'title': title, 'file': file, 'extension': extension};
 
     try {
       final token = await TokenManager.getToken();
@@ -49,64 +116,9 @@ class UserService {
         return responseData;
       } else {
         // Request failed
-        return {'error': 'Failed to login. Status code: ${response.statusCode}'};
-      }
-    } catch (e) {
-      // Exception occurred during request
-      return {'error': 'Exception occurred: $e'};
-    }
-  }
-
-  /// Create User
-  Future<Map<String, dynamic>> createUser(Map<String, dynamic> user) async {
-    final url = Uri.parse('$baseUrl/register-user');
-
-    try {
-      final token = await TokenManager.getToken();
-      final response = await http.post(
-        url,
-        body: json.encode(user),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-
-        return responseData;
-      } else {
-        // Request failed
-        return {'error': 'Failed to login. Status code: ${response.statusCode}'};
-      }
-    } catch (e) {
-      // Exception occurred during request
-      return {'error': 'Exception occurred: $e'};
-    }
-  }
-
-  /// Get Profile
-  Future<Map<String, dynamic>> getProfile() async {
-    final url = Uri.parse('$baseUrl/profile');
-
-    try {
-      final token = await TokenManager.getToken();
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-
-        return responseData;
-      } else {
-        // Request failed
-        return {'error': 'Failed to login. Status code: ${response.statusCode}'};
+        return {
+          'error': 'Failed to login. Status code: ${response.statusCode}'
+        };
       }
     } catch (e) {
       // Exception occurred during request

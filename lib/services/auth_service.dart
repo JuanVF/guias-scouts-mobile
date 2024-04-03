@@ -20,10 +20,11 @@
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'dart:convert';
+import 'package:guias_scouts_mobile/services/service_config.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  final String baseUrl = 'http://localhost:5000/auth';
+  final String baseUrl = '${ServiceConfig.host}/auth';
 
   /// GU-01: Login Use Case
   Future<Map<String, dynamic>> login(String email, String password) async {
