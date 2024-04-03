@@ -24,6 +24,8 @@ import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/common/token_manager.dart';
 import 'package:guias_scouts_mobile/controller/material_controller.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
+import 'dart:html' as html;
+
 
 class MaterialDetail extends StatefulWidget {
   final void Function(MainComponents) switchComponent; // Callback function
@@ -32,9 +34,17 @@ class MaterialDetail extends StatefulWidget {
       {Key? key, required this.switchComponent, required this.material})
       : super(key: key);
 
+  // Método para descargar el archivo
+  Future<void> _downloadFile(String url, String filename) async {
+    html.AnchorElement anchorElement =  new html.AnchorElement(href: url);
+    anchorElement.download = url;
+    anchorElement.click();
+  }
+
   @override
   _MaterialDetail createState() => _MaterialDetail();
 }
+
 
 class _MaterialDetail extends State<MaterialDetail> {
   final MaterialController controller = MaterialController();
@@ -135,6 +145,19 @@ class _MaterialDetail extends State<MaterialDetail> {
                       textAlign: TextAlign.left, // Align text to the left
                     ),
                   ), // Align child to the left
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                    elevation: 0,
+                    backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: (){
+                    widget._downloadFile(material['url'], material['title']);
+                  },
+                  child: const Text('Descargar'),
                 ),
                 averageSpacing,
                 snapshot.data?["role"] == "dirigente" ? ElevatedButton(

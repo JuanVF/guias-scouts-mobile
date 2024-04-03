@@ -20,5 +20,5 @@
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 class ServiceConfig {
-  static const String host = "http://localhost:5000";
+  static const String host = "http://ec2-3-236-202-175.compute-1.amazonaws.com:5000";
 }

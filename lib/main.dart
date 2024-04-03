@@ -24,7 +24,9 @@ import 'package:guias_scouts_mobile/common/token_manager.dart';
 import 'package:guias_scouts_mobile/pages/LoginPage/login_page.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
 
-void main() {
+
+Future<void> main() async {
+
   runApp(const MyApp());
 }
 
