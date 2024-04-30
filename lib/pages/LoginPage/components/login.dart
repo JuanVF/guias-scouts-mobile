@@ -150,17 +150,8 @@ class _LoginState extends State<Login> {
           child: const Text('Iniciar Sesión'),
         ),
         averageSpacing,
-        TextButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(50),
-            textStyle: const TextStyle(fontSize: 20, color: Colors.white),
-            elevation: 0,
-            foregroundColor: const Color.fromRGBO(48, 16, 101, 1),
-            backgroundColor: Colors.white,
-          ),
-          onPressed: () {},
-          child: const Text('Olvidé la Contraseña'),
-        ),
+        averageSpacing,
+        averageSpacing,
         averageSpacing,
         Image.asset(
           '../../../assets/guias_scouts_logo.png',

@@ -19,6 +19,7 @@
 // of this software, even if advised of the possibility of such damage.
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
+
 import 'package:guias_scouts_mobile/services/user_service.dart';
 
 enum ChangePasswordResponse {
@@ -73,6 +74,28 @@ class UserController {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getAll() async {
+    try {
+      final response = await service.getAll();
+
+      if (response.containsKey('error')) {
+        return [];
+      }
+
+      if (response['status'] != 200) {
+        return [];
+      }
+
+      List<dynamic> rawList = response['body']['users'];
+      List<Map<String, dynamic>> finalList = rawList.map<Map<String, dynamic>>((data) => data as Map<String, dynamic>).toList();
+
+      return finalList;
+    } catch (e) {
+      // Exception occurred during request
+      return [];
+    }
+  }
+
   Future<CreateUserResponse> createUser(Map<String, dynamic> user) async {
     try {
       final response = await service.createUser(user);
@@ -89,6 +112,25 @@ class UserController {
     } catch (e) {
       // Exception occurred during request
       return CreateUserResponse.SERVER_ERROR;
+    }
+  }
+
+  Future<bool> reestablishPassword(String email) async {
+    try {
+      final response = await service.reestablishPassword(email);
+
+      if (response.containsKey('error')) {
+        return false;
+      }
+
+      if (response['status'] != 200) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      // Exception occurred during request
+      return false;
     }
   }
 }

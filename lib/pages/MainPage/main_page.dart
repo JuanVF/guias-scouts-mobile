@@ -25,9 +25,10 @@ import 'package:guias_scouts_mobile/pages/MainPage/components/create_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/material_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/materials.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/my_user.dart';
+import 'package:guias_scouts_mobile/pages/MainPage/components/user_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/users.dart';
 
-enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, CREATE_USER }
+enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, CREATE_USER }
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -37,9 +38,10 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPage extends State<MainPage> {
-  MainComponents _currentComponent = MainComponents.MY_USER;
+  MainComponents _currentComponent = MainComponents.MATERIALS;
   Map<String, dynamic> _currentMaterial = {};
-  int _selectedIndex = 2;
+  Map<String, dynamic> _currentUser = {};
+  int _selectedIndex = 1;
 
   // Function to switch to a different component
   void switchComponent(MainComponents component) {
@@ -52,6 +54,13 @@ class _MainPage extends State<MainPage> {
   void setMaterial(Map<String, dynamic> material) {
     setState(() {
       _currentMaterial = material;
+    });
+  }
+
+  // Function to switch to a different component
+  void setUser(Map<String, dynamic> user) {
+    setState(() {
+      _currentUser = user;
     });
   }
 
@@ -74,6 +83,12 @@ class _MainPage extends State<MainPage> {
       case MainComponents.USERS:
         return _buildMainPage(Users(
           switchComponent: switchComponent,
+          setUser: setUser,
+        ));
+      case MainComponents.USER_DETAIL:
+        return _buildMainPage(UserDetail(
+          switchComponent: switchComponent,
+          user: _currentUser,
         ));
       case MainComponents.MATERIALS:
         return _buildMainPage(Materials(
