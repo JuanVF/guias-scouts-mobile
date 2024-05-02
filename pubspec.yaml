@@ -60,6 +60,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   path_provider: ^2.0.6
   flutter_downloader: ^1.11.6
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

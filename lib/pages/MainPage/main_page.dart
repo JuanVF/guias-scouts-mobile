@@ -22,13 +22,14 @@
 import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_material.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_user.dart';
+import 'package:guias_scouts_mobile/pages/MainPage/components/edit_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/material_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/materials.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/my_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/user_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/users.dart';
 
-enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, CREATE_USER }
+enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, EDIT_USER, CREATE_USER }
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -111,6 +112,11 @@ class _MainPage extends State<MainPage> {
       case MainComponents.CREATE_MATERIAL:
         return _buildMainPage(CreateMaterial(
           switchComponent: switchComponent,
+        ));
+      case MainComponents.EDIT_USER:
+        return _buildMainPage(EditUser(
+          switchComponent: switchComponent,
+          user: _currentUser,
         ));
       default:
         return _buildMainPage(MyUser(

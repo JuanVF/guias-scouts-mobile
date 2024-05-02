@@ -115,6 +115,25 @@ class UserController {
     }
   }
 
+  Future<CreateUserResponse> editUser(Map<String, dynamic> user) async {
+    try {
+      final response = await service.editUser(user);
+
+      if (response.containsKey('error')) {
+        return CreateUserResponse.SERVER_ERROR;
+      }
+
+      if (response['status'] != 200) {
+        return CreateUserResponse.SERVER_ERROR;
+      }
+
+      return CreateUserResponse.SUCCESS;
+    } catch (e) {
+      // Exception occurred during request
+      return CreateUserResponse.SERVER_ERROR;
+    }
+  }
+
   Future<bool> reestablishPassword(String email) async {
     try {
       final response = await service.reestablishPassword(email);

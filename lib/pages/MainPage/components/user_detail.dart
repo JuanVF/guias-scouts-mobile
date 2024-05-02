@@ -205,6 +205,7 @@ class _UserDetail extends State<UserDetail> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: (){
+                    widget.switchComponent(MainComponents.EDIT_USER);
                   },
                   child: const Text('Editar Información'),
                 ),
