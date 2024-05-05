@@ -55,6 +55,46 @@ class _ProgressForm extends State<ProgressForm> {
     _fetchQuestions();
   }
 
+  // Function to show an error dialog with the given message
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sistema'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _sendForm() async {
+    List<Map<String, dynamic>> updatedQuestions = _questions.toList(); // Create a copy of _questions
+
+    // Update user answers in the copied list
+    for (int i = 0; i < updatedQuestions.length; i++) {
+      updatedQuestions[i]['user_answer'] = _questions[i]['user_answer'];
+    }
+
+    // Send the updated questions to the server
+    final success = await _progressController.evaluate(updatedQuestions, widget.user['user_id']);
+
+    if (success) {
+      showErrorDialog("Formulario actualizado!");
+      widget.switchComponent(MainComponents.USER_DETAIL);
+    } else {
+      showErrorDialog("Ocurrió un error, inténtelo de nuevo...");
+    }
+  }
+
   Widget _buildQuestionItem(Map<String, dynamic> question) {
     bool userAnswer = question['user_answer'] == 1;
 
@@ -169,9 +209,7 @@ class _ProgressForm extends State<ProgressForm> {
               backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
               foregroundColor: Colors.white,
             ),
-            onPressed: (){
-              widget.switchComponent(MainComponents.CREATE_USER);
-            },
+            onPressed: _sendForm,
             child: const Text('Enviar Formulario'),
           ),
         ],

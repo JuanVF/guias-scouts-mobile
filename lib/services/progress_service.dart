@@ -83,7 +83,7 @@ class ProgressService {
 
   Future<Map<String, dynamic>> evaluateQuestionsByUserId(List<Map<String, dynamic>> questions, int userId) async {
     final url = Uri.parse('$baseUrl/evaluate');
-    final body = {'userId': userId, 'questions': questions };
+    final body = {'user_id': userId, 'questions': questions };
 
     try {
       final token = await TokenManager.getToken();
