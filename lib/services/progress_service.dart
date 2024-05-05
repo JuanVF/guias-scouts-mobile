@@ -53,4 +53,60 @@ class ProgressService {
       return {'error': 'Exception occurred: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> getAllProgressQuestionsByUserIdAndProgressType(String type, int userId) async {
+    final url = Uri.parse('$baseUrl/questions?progressType=$type&&userId=$userId');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {'error': 'Failed to get all progress types. Status code: ${response.statusCode}'};
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> evaluateQuestionsByUserId(List<Map<String, dynamic>> questions, int userId) async {
+    final url = Uri.parse('$baseUrl/evaluate');
+    final body = {'userId': userId, 'questions': questions };
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.post(
+        url,
+        body: json.encode(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {'error': 'Failed to get all progress types. Status code: ${response.statusCode}'};
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
 }

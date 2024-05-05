@@ -46,4 +46,45 @@ class ProgressController {
       return [];
     }
   }
+
+  Future<List<Map<String, dynamic>>> getAllProgressQuestionsByUserIdAndProgressType(String type, int userId) async {
+    try {
+      final response = await service.getAllProgressQuestionsByUserIdAndProgressType(type, userId);
+
+      if (response.containsKey('error')) {
+        return [];
+      }
+
+      if (response['status'] != 200) {
+        return [];
+      }
+
+      List<dynamic> rawList = response['body']['questions'];
+      List<Map<String, dynamic>> finalList = rawList.map<Map<String, dynamic>>((data) => data as Map<String, dynamic>).toList();
+
+      return finalList;
+    } catch (e) {
+      // Exception occurred during request
+      return [];
+    }
+  }
+
+  Future<bool> evaluate(List<Map<String, dynamic>> questions, int userId) async {
+    try {
+      final response = await service.evaluateQuestionsByUserId(questions, userId);
+
+      if (response.containsKey('error')) {
+        return false;
+      }
+
+      if (response['status'] != 200) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      // Exception occurred during request
+      return false;
+    }
+  }
 }
