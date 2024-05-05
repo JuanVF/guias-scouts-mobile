@@ -21,6 +21,7 @@
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:guias_scouts_mobile/common/token_manager.dart';
 import 'package:guias_scouts_mobile/controller/auth_controller.dart';
 import 'package:guias_scouts_mobile/pages/LoginPage/login_page.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
@@ -88,8 +89,10 @@ class _LoginState extends State<Login> {
       return;
     }
 
+    final user = await TokenManager.getDecodedToken();
+
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const MainPage()));
+        context, MaterialPageRoute(builder: (context) => MainPage(user: user!,)));
   }
 
   @override

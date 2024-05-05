@@ -42,12 +42,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FutureBuilder<String?>(
-        future: TokenManager.getToken(),
+      home: FutureBuilder<Map<String, dynamic>?>(
+        future: TokenManager.getDecodedToken(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData && snapshot.data != "") {
-              return const MainPage();
+            if (snapshot.hasData && snapshot.data != null) {
+              return MainPage(user: snapshot.data!,);
             }
             return const LoginPage();
           }

@@ -19,7 +19,9 @@
 // of this software, even if advised of the possibility of such damage.
 //
 // For licensing opportunities, please contact tropa92cr@gmail.com.
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:guias_scouts_mobile/controller/user_controller.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_material.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/edit_user.dart';
@@ -33,13 +35,17 @@ import 'package:guias_scouts_mobile/pages/MainPage/components/users.dart';
 enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, EDIT_USER, CREATE_USER, PROGRESS_FORM }
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  final Map<String, dynamic> user;
+
+  const MainPage({Key? key, required this.user}) : super(key: key);
 
   @override
   _MainPage createState() => _MainPage();
 }
 
 class _MainPage extends State<MainPage> {
+  final UserController controller = UserController();
+
   MainComponents _currentComponent = MainComponents.MATERIALS;
   Map<String, dynamic> _currentMaterial = {};
   String _currentProgressType = "";
@@ -81,9 +87,33 @@ class _MainPage extends State<MainPage> {
       MainComponents.MATERIALS,
       MainComponents.MY_USER
     ];
+
+    if (widget.user['role'] != 'dirigente') {
+      pages = [
+        MainComponents.USER_DETAIL,
+        MainComponents.MATERIALS,
+        MainComponents.MY_USER
+      ];
+    }
+
     setState(() {
       _selectedIndex = index;
       _currentComponent = pages[index];
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    final user = await controller.getProfile();
+    user['user_id'] = user['id'];
+    setState(() {
+      _currentUser = user;
     });
   }
 
@@ -157,16 +187,16 @@ class _MainPage extends State<MainPage> {
         onTap: _onItemTapped,
         backgroundColor: Colors.white,
         elevation: 0,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Usuarios',
+            icon: Icon(widget.user['role'] == 'dirigente' ? Icons.people : Icons.bar_chart),
+            label: widget.user['role'] == 'dirigente' ? 'Usuarios' : 'Progresos',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.receipt),
             label: 'Material',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Mi Usuario',
           ),

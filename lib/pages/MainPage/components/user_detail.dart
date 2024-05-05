@@ -199,7 +199,7 @@ class _UserDetail extends State<UserDetail> {
                   ),
                 ),
                 averageSpacing,
-                ElevatedButton(
+                snapshot.data?['role'] == "dirigente" ? ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     textStyle: const TextStyle(fontSize: 20, color: Colors.white),
@@ -211,9 +211,9 @@ class _UserDetail extends State<UserDetail> {
                     widget.switchComponent(MainComponents.EDIT_USER);
                   },
                   child: const Text('Editar Información'),
-                ),
+                ) : Container(),
                 averageSpacing,
-                ElevatedButton(
+                snapshot.data?['role'] == "dirigente" ? ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     textStyle: const TextStyle(fontSize: 20, color: Colors.white),
@@ -223,7 +223,7 @@ class _UserDetail extends State<UserDetail> {
                   ),
                   onPressed: onReestablishSelected,
                   child: const Text('Reestablecer Contraseña'),
-                ),
+                ) : Container(),
                 averageSpacing,
                 snapshot.data?["role"] == "dirigente" ? ElevatedButton(
                   style: ElevatedButton.styleFrom(

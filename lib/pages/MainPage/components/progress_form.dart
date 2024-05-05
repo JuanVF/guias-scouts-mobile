@@ -28,7 +28,12 @@ class ProgressForm extends StatefulWidget {
   final void Function(MainComponents) switchComponent;
   final String progressType;
   final Map<String, dynamic> user;
-  const ProgressForm({Key? key, required this.switchComponent, required this.progressType, required this.user}) : super(key: key);
+  const ProgressForm(
+      {Key? key,
+      required this.switchComponent,
+      required this.progressType,
+      required this.user})
+      : super(key: key);
 
   @override
   _ProgressForm createState() => _ProgressForm();
@@ -40,8 +45,11 @@ class _ProgressForm extends State<ProgressForm> {
   List<String> _questionTypes = [];
 
   Future<void> _fetchQuestions() async {
-    final questions = await _progressController.getAllProgressQuestionsByUserIdAndProgressType(widget.progressType, widget.user['user_id']);
-    final Set<String> questionTypesSet = questions.map<String>((question) => question['question_type']).toSet();
+    final questions = await _progressController
+        .getAllProgressQuestionsByUserIdAndProgressType(
+            widget.progressType, widget.user['user_id']);
+    final Set<String> questionTypesSet =
+        questions.map<String>((question) => question['question_type']).toSet();
     final List<String> questionTypes = questionTypesSet.toList();
     setState(() {
       _questions = questions;
@@ -77,7 +85,8 @@ class _ProgressForm extends State<ProgressForm> {
   }
 
   Future<void> _sendForm() async {
-    List<Map<String, dynamic>> updatedQuestions = _questions.toList(); // Create a copy of _questions
+    List<Map<String, dynamic>> updatedQuestions =
+        _questions.toList(); // Create a copy of _questions
 
     // Update user answers in the copied list
     for (int i = 0; i < updatedQuestions.length; i++) {
@@ -85,7 +94,8 @@ class _ProgressForm extends State<ProgressForm> {
     }
 
     // Send the updated questions to the server
-    final success = await _progressController.evaluate(updatedQuestions, widget.user['user_id']);
+    final success = await _progressController.evaluate(
+        updatedQuestions, widget.user['user_id']);
 
     if (success) {
       showErrorDialog("Formulario actualizado!");
@@ -120,18 +130,21 @@ class _ProgressForm extends State<ProgressForm> {
           ),
           Checkbox(
             value: userAnswer,
-            onChanged: (bool? value) {
-              setState(() {
-                question['user_answer'] = value! ? 1 : 0;
-              });
-            },
+            onChanged: widget.user['role_name'] == 'dirigente'
+                ? (bool? value) {
+                    setState(() {
+                      question['user_answer'] = value! ? 1 : 0;
+                    });
+                  }
+                : null,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuestionSection(List<Map<String, dynamic>> questions, String questionType) {
+  Widget _buildQuestionSection(
+      List<Map<String, dynamic>> questions, String questionType) {
     List<Widget> questionWidgets = [];
 
     for (var question in questions) {
@@ -201,7 +214,7 @@ class _ProgressForm extends State<ProgressForm> {
             ),
           ),
           averageSpacing,
-          ElevatedButton(
+          widget.user['role_name'] == "dirigente" ? ElevatedButton(
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
               textStyle: const TextStyle(fontSize: 20, color: Colors.white),
@@ -211,7 +224,7 @@ class _ProgressForm extends State<ProgressForm> {
             ),
             onPressed: _sendForm,
             child: const Text('Enviar Formulario'),
-          ),
+          ) : Container(),
         ],
       ),
     );

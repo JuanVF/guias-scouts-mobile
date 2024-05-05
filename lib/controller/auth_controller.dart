@@ -54,7 +54,7 @@ class AuthController {
         return LoginResponse.NEEDS_CONFIRMATION;
       }
 
-      TokenManager.storeToken(response['body']['token']);
+      await TokenManager.storeToken(response['body']['token']);
 
       return LoginResponse.SUCCESS;
     } catch (e) {
