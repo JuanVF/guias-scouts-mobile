@@ -26,10 +26,11 @@ import 'package:guias_scouts_mobile/pages/MainPage/components/edit_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/material_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/materials.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/my_user.dart';
+import 'package:guias_scouts_mobile/pages/MainPage/components/progress_form.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/user_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/users.dart';
 
-enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, EDIT_USER, CREATE_USER }
+enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, EDIT_USER, CREATE_USER, PROGRESS_FORM }
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -41,6 +42,7 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   MainComponents _currentComponent = MainComponents.MATERIALS;
   Map<String, dynamic> _currentMaterial = {};
+  String _currentProgressType = "";
   Map<String, dynamic> _currentUser = {};
   int _selectedIndex = 1;
 
@@ -62,6 +64,13 @@ class _MainPage extends State<MainPage> {
   void setUser(Map<String, dynamic> user) {
     setState(() {
       _currentUser = user;
+    });
+  }
+
+  // Function to switch to a different component
+  void setProgressType(String progressType) {
+    setState(() {
+      _currentProgressType = progressType;
     });
   }
 
@@ -90,6 +99,7 @@ class _MainPage extends State<MainPage> {
         return _buildMainPage(UserDetail(
           switchComponent: switchComponent,
           user: _currentUser,
+          setProgressType: setProgressType,
         ));
       case MainComponents.MATERIALS:
         return _buildMainPage(Materials(
@@ -117,6 +127,12 @@ class _MainPage extends State<MainPage> {
         return _buildMainPage(EditUser(
           switchComponent: switchComponent,
           user: _currentUser,
+        ));
+      case MainComponents.PROGRESS_FORM:
+        return _buildMainPage(ProgressForm(
+          switchComponent: switchComponent,
+          user: _currentUser,
+          progressType: _currentProgressType,
         ));
       default:
         return _buildMainPage(MyUser(

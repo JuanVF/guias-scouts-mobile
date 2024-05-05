@@ -31,8 +31,9 @@ import 'dart:html' as html;
 class UserDetail extends StatefulWidget {
   final void Function(MainComponents) switchComponent; // Callback function
   final Map<String, dynamic> user; // Callback function
+  final void Function(String) setProgressType; // Callback function
   const UserDetail(
-      {Key? key, required this.switchComponent, required this.user})
+      {Key? key, required this.switchComponent, required this.user, required this.setProgressType})
       : super(key: key);
 
   @override
@@ -129,6 +130,8 @@ class _UserDetail extends State<UserDetail> {
           ),
           InkWell(
             onTap: () {
+              widget.setProgressType(user['name']);
+              widget.switchComponent(MainComponents.PROGRESS_FORM);
             },
             child: const Icon(Icons.remove_red_eye, color: Color.fromRGBO(48, 16, 101, 1)),
           )
