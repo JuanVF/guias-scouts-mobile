@@ -40,6 +40,33 @@ class _MyUser extends State<MyUser> {
 
   final UserController controller = UserController();
 
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _birthdayController;
+  int? _selectedRole;
+  int? _selectedPatrulla;
+
+  Map<String, dynamic> _user = {};
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    final user = await controller.getProfile();
+
+    _nameController = TextEditingController(text: user["fullname"]);
+    _emailController = TextEditingController(text: user["email"]);
+    _birthdayController = TextEditingController(text: _formatBirthday(user["birthday"]));
+
+    setState(() {
+      _user = user;
+    });
+  }
+
   // Function to show an error dialog with the given message
   void showErrorDialog(String message) {
     showDialog(
@@ -81,6 +108,41 @@ class _MyUser extends State<MyUser> {
     showErrorDialog('Contraseña Cambiada!');
   }
 
+  int _parseBirthday(String dateString) {
+    List<String> parts = dateString.split('/');
+    int year = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
+    int day = int.parse(parts[2]);
+    return DateTime(year, month, day).millisecondsSinceEpoch ~/ 1000;
+  }
+
+  Future<void> handleEditUser() async {
+    // Retrieve values from controllers
+    String name = _nameController.text;
+    String email = _emailController.text;
+    int birthdayEpoch = _birthdayController.text.isEmpty
+        ? DateTime.now().millisecondsSinceEpoch ~/ 1000
+        : _parseBirthday(_birthdayController.text);
+
+    final user = {
+      "id" : _user["id"],
+      "fullname" : name,
+      "email" : email,
+      "birthday" : birthdayEpoch,
+      "id_role" : _user["id_role"],
+      "id_patrol" : _user["id_patrol"] ?? 1
+    };
+
+    final result = await controller.editUser(user);
+
+    if (result == CreateUserResponse.SERVER_ERROR) {
+      showErrorDialog("Ha ocurrido un error, inténtalo de nuevo...");
+      return;
+    }
+
+    showErrorDialog("¡Usuario Editado!");
+  }
+
   Future<void> handleLogout() async {
     TokenManager.storeToken("");
 
@@ -105,204 +167,191 @@ class _MyUser extends State<MyUser> {
     const averageSpacing = SizedBox(height: 20);
     const averageInnerSpacing = SizedBox(height: 10);
 
-    return FutureBuilder(
-        future: controller.getProfile(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return  const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Title Container
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              color: Color.fromRGBO(255, 255, 255, 1),
+            ),
+            alignment: Alignment.centerLeft,
+            child: const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                'Mi Usuario',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
+                  color: Color.fromRGBO(48, 16, 101, 1),
+                ),
+                textAlign: TextAlign.left, // Align text to the left
               ),
-            );
-          }
-
-          return Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // Title Container
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    color: Color.fromRGBO(255, 255, 255, 1),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  child: const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(
-                      'Mi Usuario',
+            ), // Align child to the left
+          ),
+          averageSpacing,
+          // User Container
+          Container(
+            width: double.infinity, // Make the container full width
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              color: Color.fromRGBO(255, 255, 255, 1),
+            ),
+            alignment: Alignment.centerLeft,
+            child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Detalles de tu Usuario',
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Inter',
                         color: Color.fromRGBO(48, 16, 101, 1),
                       ),
                       textAlign: TextAlign.left, // Align text to the left
                     ),
-                  ), // Align child to the left
-                ),
-                averageSpacing,
-                // User Container
-                Container(
-                  width: double.infinity, // Make the container full width
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    color: Color.fromRGBO(255, 255, 255, 1),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Detalles de tu Usuario',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Inter',
-                              color: Color.fromRGBO(48, 16, 101, 1),
-                            ),
-                            textAlign: TextAlign.left, // Align text to the left
-                          ),
-                          averageInnerSpacing,
-                          Text(
-                            'Tu ID es ${snapshot.data?["id"] ?? ''}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Inter',
-                              color: Color.fromRGBO(48, 16, 101, 1),
-                            ),
-                            textAlign: TextAlign.left, // Align text to the left
-                          ),
-                          averageInnerSpacing,
-                          TextField(
-                            controller: TextEditingController()..text = snapshot.data?["fullname"] ?? '',
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Nombre Completo',
-                            ),
-                          ),
-                          averageInnerSpacing,
-                          TextField(
-                            readOnly: snapshot.data!['role_name'] == "dirigente",
-                            controller: TextEditingController()..text = snapshot.data!['role_name'] != "dirigente" ? snapshot.data!["patrol_name"] : 'N/A',
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Patrulla',
-                            ),
-                          ),
-                          averageInnerSpacing,
-                          TextField(
-                            keyboardType: TextInputType.emailAddress,
-                            controller: TextEditingController()..text = snapshot.data!['email'],
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Correo',
-                            ),
-                          ),
-                          averageInnerSpacing,
-                          TextField(
-                            keyboardType: TextInputType.emailAddress,
-                            controller: TextEditingController()..text = '${_formatBirthday(snapshot.data!['birthday'])}',
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Fecha de Nacimiento',
-                            ),
-                          ),
-                          averageSpacing,
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(50),
-                              textStyle: const TextStyle(fontSize: 20, color: Colors.white),
-                              elevation: 0,
-                              backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: (){},
-                            child: const Text('Actualizar Datos'),
-                          ),
-                        ],
-                      )), // Align child to the left
-                ),
-                averageSpacing,
-                // Password Container
-                Container(
-                  width: double.infinity, // Make the container full width
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    color: Color.fromRGBO(255, 255, 255, 1),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Cambiar Contraseña',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Inter',
-                              color: Color.fromRGBO(48, 16, 101, 1),
-                            ),
-                            textAlign: TextAlign.left, // Align text to the left
-                          ),
-                          averageInnerSpacing,
-                          TextField(
-                            keyboardType: TextInputType.visiblePassword,
-                            controller: prevPassword,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Antigua Contraseña',
-                            ),
-                          ),
-                          averageInnerSpacing,
-                          TextField(
-                            keyboardType: TextInputType.visiblePassword,
-                            controller: newPassword,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Nueva Contraseña',
-                            ),
-                          ),
-                          averageSpacing,
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(50),
-                              textStyle: const TextStyle(fontSize: 20, color: Colors.white),
-                              elevation: 0,
-                              backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: handleChangePassword,
-                            child: const Text('Cambiar Contraseña'),
-                          ),
-                          averageSpacing,
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(50),
-                              textStyle: const TextStyle(fontSize: 20, color: Colors.white),
-                              elevation: 0,
-                              backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: handleLogout,
-                            child: const Text('Cerrar Sesión'),
-                          ),
-                        ],
-                      )), // Align child to the left
-                ),
-              ],
+                    averageInnerSpacing,
+                    Text(
+                      'Tu ID es ${_user["id"] ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter',
+                        color: Color.fromRGBO(48, 16, 101, 1),
+                      ),
+                      textAlign: TextAlign.left, // Align text to the left
+                    ),
+                    averageInnerSpacing,
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Nombre Completo',
+                      ),
+                    ),
+                    averageInnerSpacing,
+                    TextField(
+                      readOnly: true,
+                      controller: TextEditingController()..text = _user['role_name'],
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Patrulla',
+                      ),
+                    ),
+                    averageInnerSpacing,
+                    TextField(
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Correo',
+                      ),
+                    ),
+                    averageInnerSpacing,
+                    TextField(
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _birthdayController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Fecha de Nacimiento',
+                      ),
+                    ),
+                    averageSpacing,
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                        elevation: 0,
+                        backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: handleEditUser,
+                      child: const Text('Actualizar Datos'),
+                    ),
+                  ],
+                )), // Align child to the left
+          ),
+          averageSpacing,
+          // Password Container
+          Container(
+            width: double.infinity, // Make the container full width
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              color: Color.fromRGBO(255, 255, 255, 1),
             ),
-          );
-        }
+            alignment: Alignment.centerLeft,
+            child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Cambiar Contraseña',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter',
+                        color: Color.fromRGBO(48, 16, 101, 1),
+                      ),
+                      textAlign: TextAlign.left, // Align text to the left
+                    ),
+                    averageInnerSpacing,
+                    TextField(
+                      keyboardType: TextInputType.visiblePassword,
+                      controller: prevPassword,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Antigua Contraseña',
+                      ),
+                    ),
+                    averageInnerSpacing,
+                    TextField(
+                      keyboardType: TextInputType.visiblePassword,
+                      controller: newPassword,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Nueva Contraseña',
+                      ),
+                    ),
+                    averageSpacing,
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                        elevation: 0,
+                        backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: handleChangePassword,
+                      child: const Text('Cambiar Contraseña'),
+                    ),
+                    averageSpacing,
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                        elevation: 0,
+                        backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: handleLogout,
+                      child: const Text('Cerrar Sesión'),
+                    ),
+                  ],
+                )), // Align child to the left
+          ),
+        ],
+      ),
     );
   }
 }
