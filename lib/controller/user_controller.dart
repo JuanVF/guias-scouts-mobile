@@ -152,4 +152,23 @@ class UserController {
       return false;
     }
   }
+
+  Future<bool> deleteUser(int id) async {
+    try {
+      final response = await service.deleteUser(id);
+
+      if (response.containsKey('error')) {
+        return false;
+      }
+
+      if (response['status'] != 200) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      // Exception occurred during request
+      return false;
+    }
+  }
 }

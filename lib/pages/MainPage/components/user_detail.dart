@@ -140,6 +140,27 @@ class _UserDetail extends State<UserDetail> {
     );
   }
 
+  // Function to handle the login process
+  Future<void> handleDeleteUser() async {
+    final shouldDelete = await showErrorDialog("¿Está seguro de borrar el usuario?");
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    bool result = await userController.deleteUser(widget.user['user_id']);
+
+    if (!result) {
+      showErrorDialog('Ha ocurrido un error. Inténtelo de nuevo.');
+      return;
+    }
+
+    await showErrorDialog('Usuario borrado!');
+
+
+    widget.switchComponent(MainComponents.USERS);
+  }
+  
   @override
   Widget build(BuildContext context) {
     const averageSpacing = SizedBox(height: 20);
@@ -233,9 +254,7 @@ class _UserDetail extends State<UserDetail> {
                     backgroundColor: const Color.fromRGBO(184, 31, 31, 1),
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: () {
-
-                  },
+                  onPressed: handleDeleteUser,
                   child: const Text('Borrar Usuario'),
                 ) : Container(),
               ],

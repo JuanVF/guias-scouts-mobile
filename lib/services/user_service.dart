@@ -198,4 +198,32 @@ class UserService {
       return {'error': 'Exception occurred: $e'};
     }
   }
+
+  /// Reestablish an user password by its email
+  Future<Map<String, dynamic>> deleteUser(int id) async {
+    final url = Uri.parse('$baseUrl/delete-user?id=$id');
+
+    try {
+      final token = await TokenManager.getToken();
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        return responseData;
+      } else {
+        // Request failed
+        return {'error': 'Failed to delete user. Status code: ${response.statusCode}'};
+      }
+    } catch (e) {
+      // Exception occurred during request
+      return {'error': 'Exception occurred: $e'};
+    }
+  }
 }
