@@ -96,6 +96,28 @@ class UserController {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getAllByPatrol(String patrol) async {
+    try {
+      final response = await service.getAllByPatrol(patrol);
+
+      if (response.containsKey('error')) {
+        return [];
+      }
+
+      if (response['status'] != 200) {
+        return [];
+      }
+
+      List<dynamic> rawList = response['body']['users'];
+      List<Map<String, dynamic>> finalList = rawList.map<Map<String, dynamic>>((data) => data as Map<String, dynamic>).toList();
+
+      return finalList;
+    } catch (e) {
+      // Exception occurred during request
+      return [];
+    }
+  }
+
   Future<CreateUserResponse> createUser(Map<String, dynamic> user) async {
     try {
       final response = await service.createUser(user);

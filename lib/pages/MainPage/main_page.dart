@@ -22,6 +22,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:guias_scouts_mobile/controller/user_controller.dart';
+import 'package:guias_scouts_mobile/pages/MainPage/components/add_patrol.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_material.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/create_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/edit_user.dart';
@@ -31,8 +32,9 @@ import 'package:guias_scouts_mobile/pages/MainPage/components/my_user.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/progress_form.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/user_detail.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/components/users.dart';
+import 'package:guias_scouts_mobile/pages/MainPage/components/users_by_patrol.dart';
 
-enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, EDIT_USER, CREATE_USER, PROGRESS_FORM }
+enum MainComponents { MY_USER, MATERIALS, CREATE_MATERIAL, MATERIAL_DETAIL, PROGRESS, USERS, USER_DETAIL, EDIT_USER, CREATE_USER, PROGRESS_FORM, ADD_PATROL, USERS_BY_PATROL }
 
 class MainPage extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -49,6 +51,7 @@ class _MainPage extends State<MainPage> {
   MainComponents _currentComponent = MainComponents.MATERIALS;
   Map<String, dynamic> _currentMaterial = {};
   String _currentProgressType = "";
+  String _currentPatrol = "";
   Map<String, dynamic> _currentUser = {};
   int _selectedIndex = 1;
 
@@ -77,6 +80,13 @@ class _MainPage extends State<MainPage> {
   void setProgressType(String progressType) {
     setState(() {
       _currentProgressType = progressType;
+    });
+  }
+
+  // Function to switch to a different component
+  void setPatrol(String patrol) {
+    setState(() {
+      _currentPatrol = patrol;
     });
   }
 
@@ -124,6 +134,7 @@ class _MainPage extends State<MainPage> {
         return _buildMainPage(Users(
           switchComponent: switchComponent,
           setUser: setUser,
+          setPatrol: setPatrol,
         ));
       case MainComponents.USER_DETAIL:
         return _buildMainPage(UserDetail(
@@ -143,6 +154,15 @@ class _MainPage extends State<MainPage> {
       case MainComponents.CREATE_USER:
         return _buildMainPage(CreateUser(
           switchComponent: switchComponent,
+        ));
+      case MainComponents.ADD_PATROL:
+        return _buildMainPage(AddPatrol(
+          switchComponent: switchComponent,
+        ));
+      case MainComponents.USERS_BY_PATROL:
+        return _buildMainPage(UsersByPatrol(
+          switchComponent: switchComponent,
+          patrol: _currentPatrol,
         ));
       case MainComponents.MATERIAL_DETAIL:
         return _buildMainPage(MaterialDetail(

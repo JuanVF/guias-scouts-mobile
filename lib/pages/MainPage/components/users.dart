@@ -21,13 +21,15 @@
 // For licensing opportunities, please contact tropa92cr@gmail.com.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:guias_scouts_mobile/controller/patrol_controller.dart';
 import 'package:guias_scouts_mobile/controller/user_controller.dart';
 import 'package:guias_scouts_mobile/pages/MainPage/main_page.dart';
 
 class Users extends StatefulWidget {
   final void Function(MainComponents) switchComponent; // Callback function
   final void Function(Map<String, dynamic>) setUser; // Callback function
-  const Users({Key? key, required this.switchComponent, required this.setUser}) : super(key: key);
+  final void Function(String) setPatrol; // Callback function
+  const Users({Key? key, required this.switchComponent, required this.setUser, required this.setPatrol}) : super(key: key);
 
   @override
   _Users createState() => _Users();
@@ -35,12 +37,17 @@ class Users extends StatefulWidget {
 
 class _Users extends State<Users> {
   final UserController _userController = UserController();
+  final PatrolController _patrolController = PatrolController();
+
   List<Map<String, dynamic>> _users = [];
+  List<Map<String, dynamic>> _patrols = [];
 
   Future<void> _fetchUsers() async {
     final users = await _userController.getAll();
+    final patrols = await _patrolController.getAll();
     setState(() {
       _users = users;
+      _patrols = patrols;
     });
   }
 
@@ -79,6 +86,43 @@ class _Users extends State<Users> {
             onTap: () {
               widget.setUser(user);
               widget.switchComponent(MainComponents.USER_DETAIL);
+            },
+            child: const Icon(Icons.remove_red_eye, color: Color.fromRGBO(48, 16, 101, 1)),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPatrolItem(Map<String, dynamic> patrol) {
+    const averageInnerSpacing = SizedBox(width: 10);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Icon(Icons.folder, color: Colors.red),
+          averageInnerSpacing,
+          Expanded(
+            child: Text(
+              patrol['name'],
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              widget.setPatrol(patrol['name']);
+              widget.switchComponent(MainComponents.USERS_BY_PATROL);
             },
             child: const Icon(Icons.remove_red_eye, color: Color.fromRGBO(48, 16, 101, 1)),
           )
@@ -129,6 +173,14 @@ class _Users extends State<Users> {
             ),
           ),
           averageSpacing,
+          Expanded(
+            child: ListView.builder(
+              itemCount: _patrols.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildPatrolItem(_patrols[index]);
+              },
+            ),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
@@ -141,6 +193,20 @@ class _Users extends State<Users> {
               widget.switchComponent(MainComponents.CREATE_USER);
             },
             child: const Text('Agregar Integrante'),
+          ),
+          averageSpacing,
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+              textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+              elevation: 0,
+              backgroundColor: const Color.fromRGBO(48, 16, 101, 1),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: (){
+              widget.switchComponent(MainComponents.ADD_PATROL);
+            },
+            child: const Text('Agregar Patrulla'),
           ),
         ],
       ),
